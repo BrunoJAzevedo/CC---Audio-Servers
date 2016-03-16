@@ -3,3 +3,6 @@
 
 " Java class files.
 *.class
+
+" Build files.
+build/
