@@ -1,4 +1,6 @@
-pdu: src/PDU/PDUType.java
+build: clean pdu
+
+pdu: src/PDU/PDUType.java src/PDU/PDU.java
 	mkdir build
 	javac src/PDU/*.java -d build/
 
