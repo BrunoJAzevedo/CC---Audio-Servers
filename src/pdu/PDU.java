@@ -1,10 +1,25 @@
 package pdu;
 
-public class PDU {
-  final public int version;
-  final public int security;
-  final public int type;
-  final public int options[];
+public abstract class PDU {
+  private int version;
+  private int security;
+  private int type;
+  private int options[];
+
+  /**
+   *  Create a new PDU packet with some default version to 1 and default
+   *  security to 0 (none).
+   *
+   *  @param  type      The PDU type, check PDUType.java for the availabel pdu types.
+   *  @param  options   Aditional pdu options.
+   *  @return An instance of a PDU.
+   */
+  public PDU(PDUType type, int options[]) {
+    this.version  = 1;
+    this.security = 0;
+    this.type     = type.value();
+    this.options  = options;
+  }
 
   /**
    *  Create a new PDU packet.
@@ -15,10 +30,31 @@ public class PDU {
    *  @param  options   Aditional pdu options.
    *  @return An instance of a PDU.
    */
-  public PDU (int version, int security, PDUType type, int options[]) {
+  public PDU(int version, int security, PDUType type, int options[]) {
     this.version  = version;
     this.security = security;
     this.type     = type.value();
     this.options  = options;
   }
+
+  /**
+   *  @return PDU version value.
+   */
+  public int getVersion() { return this.version; }
+
+  /**
+   *  @return PDU security parameter.
+   */
+  public int getSecurity() { return this.security; }
+
+  /**
+   *  @return PDU type value.
+   */
+  public int getType() { return this.type; }
+
+  /**
+   *  @return PDU options values.
+   */
+  public int[] getOptions () { return this.options; }
+
 }
