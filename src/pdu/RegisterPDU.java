@@ -1,6 +1,6 @@
 package pdu;
 
-public class PDURegister extends PDU {
+public class RegisterPDU extends PDU {
   int     registerType;
   String  id;
   String  ip;
@@ -17,7 +17,7 @@ public class PDURegister extends PDU {
    *  @param  ip            The client machine's IP address.
    *  @param  port          The port where to receive packets for the application.
    */
-  public PDURegister(int version, int security, int[] options, int registerType, String id,
+  public RegisterPDU(int version, int security, int[] options, int registerType, String id,
       String ip, int port) {
     super(version, security, PDUType.REGISTER, options);
     this.registerType = registerType;
@@ -30,7 +30,7 @@ public class PDURegister extends PDU {
 
   /** @return PDU registration type. If the value is 1 it means the user is trying to
    *  login/register otherwise it is trying to logout from the system. */
-  public int getResgiterType() { return this.registerType; }
+  public int getRegisterType() { return this.registerType; }
 
   /** @return Client id. */
   public String getID() { return this.id.toString(); }
