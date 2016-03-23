@@ -17,7 +17,7 @@ public class ProbeResponsePDU extends PDU {
    *  @param  timestamp Timestamp of when the PDU is created.
    */
   public ProbeResponsePDU(Timestamp timestamp) {
-    super(PDUType.REGISTER, new int[] {0,0,0,0});
+    super(PDUType.PROBE_RESPONSE, new int[] {0,0,0,0});
     this.timestamp = (Timestamp) timestamp.clone();
   }
 
@@ -30,7 +30,7 @@ public class ProbeResponsePDU extends PDU {
    *  @param  timestamp Timestamp of when the PDU is created.
    */
   public ProbeResponsePDU(int version, int security, int[] options, Timestamp timestamp) {
-    super(version, security, PDUType.REGISTER, options);
+    super(version, security, PDUType.PROBE_RESPONSE, options);
     this.timestamp = (Timestamp) timestamp.clone();
   }
 

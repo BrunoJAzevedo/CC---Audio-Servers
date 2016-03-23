@@ -17,6 +17,6 @@ public class ProbeRequestPDU extends PDU {
    *  @param  message   Message to be sent with the PDU.
    */
   public ProbeRequestPDU(int version, int security, int[] options) {
-    super(version, security, PDUType.REGISTER, options);
+    super(version, security, PDUType.PROBE_REQUEST, options);
   }
 }
