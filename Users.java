@@ -13,9 +13,12 @@ import java.util.HashMap;
 public class Users {
   // Map between username and password.
   private HashMap<String, String> users;
+  // Map between username and session state, the state is set to true if the user is logged in.
+  private HashMap<String, Boolean> state;
 
   public Users() {
     users = new HashMap<String, String>();
+    state = new HashMap<String, Boolean>();
   }
 
 
@@ -51,7 +54,6 @@ public class Users {
       try {
         String hashedPassword = SHA256HashCalculator(password);
         users.put(user, hashedPassword);
-        System.out.println((String) users.get(user));
       } catch (Exception e) {
         throw new Exception("Password Hashing Failed");
       }
@@ -63,20 +65,37 @@ public class Users {
    *  @param  usernmae  The user's username. The username is case insentitive, so, for example
    *                    "John" is transformed to "john".
    *  @param  passowrd  The user's password.
+   *  @return true if the login suceeded, false if the user does not exist or if the user
+   *          is currently logged in.
    */
-  public boolean loginUser(String username, String password) {
+  public Boolean loginUser(String username, String password) {
     String user = username.toLowerCase();
 
-    if (!users.containsKey(user)) { return false; }
+    if (!users.containsKey(user))     { return false; }
+    else if (state.containsKey(user)) { return false; }
     else {
       try {
         String hashedPassword = SHA256HashCalculator(password);
         String savedPassword  = (String) users.get(user);
 
-        return savedPassword.equals(hashedPassword);
+        if (savedPassword.equals(hashedPassword)) {
+          // Mark the user as logged in.
+          state.put(user, true);
+          return true;
+        } else { return false; }
       } catch (Exception e) {
         return false;
       }
     }
+  }
+
+  /** Logout the user from the system.
+   *
+   *  @param  username  The user's username, case insenstive.
+   */
+  public void logoutUser(String username) {
+    String user = username.toLowerCase();
+
+    if (state.containsKey(user)) { state.remove(user); }
   }
 }
