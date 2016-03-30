@@ -8,24 +8,7 @@ public class client {
 
     private client() {}
 
-    /*public static void commands(String command) throws IOException{
-        String[] args = command.split("\\s+");
-        int nargs = args.length;
-        String operation = args[0].toUpperCase();
-        try {
-            switch(operation) {
-                case "HELLO":
-                    Hello stub = (Hello) this.registry.lookup("Hello");
-                    System.out.println("Entrou: "+operation);
-                    String response = stub.sayHello();
-                    System.out.println("response: " + response);    
-            }
-        }catch(Exception e) {
-            System.err.println("Client exception: " + e.toString());
-            e.printStackTrace();
-        }
-    }*/
-
+    //Cliente
     public static void main(String[] args) {
 
         String host = (args.length < 1) ? null : args[0];
@@ -33,14 +16,17 @@ public class client {
         try {
             Registry registry = LocateRegistry.getRegistry(host);
             Scanner scanner = new Scanner(System.in);
+            String response;
+            Hello stub = (Hello) registry.lookup("Hello");
+
             while(!(command = scanner.nextLine()).toUpperCase().equals("END")){
                 operation = command.toUpperCase();
                 switch(operation) {
                  case "HELLO":
-                    Hello stub = (Hello) registry.lookup("Hello");
-                    String response = stub.sayHello();
-                    System.out.println("response: " + response);   
-                }   
+                     response = stub.sayHello();
+                     System.out.println("response: " + response);    
+                     break; 
+                                 } 
             }
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
