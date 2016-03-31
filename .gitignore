@@ -1,0 +1,8 @@
+" Vim swap files.
+*.swp
+
+" Java class files.
+*.class
+
+" Build files.
+build/
