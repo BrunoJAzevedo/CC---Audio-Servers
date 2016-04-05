@@ -6,6 +6,24 @@ public class RegisterPDU extends PDU {
   String  ip;
   int     port;
 
+
+  /**
+   *  Parameterized constructor.
+   *
+   *  @param  registerType  Wether the user wants to login(1) or logout(0).
+   *  @param  id            The client identifier.
+   *  @param  ip            The client machine's IP address.
+   *  @param  port          The port where to receive packets for the application.
+   */
+  public RegisterPDU(int registerType, String id,String ip, int port) {
+    super(PDUType.REGISTER, new int[] {0,0,0,0});
+    this.registerType = registerType;
+    this.id = id;
+    this.ip = ip;
+    this.port  = port;
+  }
+
+
   /**
    *  Parametrized constructor.
    *
