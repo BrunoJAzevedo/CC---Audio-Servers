@@ -13,15 +13,17 @@ public class client {
         try {
             Registry registry = LocateRegistry.getRegistry(host);
             Hello stub = (Hello) registry.lookup("Hello");
-            switch(command) {
+            String[] strings = command.split(" ");
+            switch(strings[0]) {
                 case "HELLO":
                     response = stub.sayHello();
                     System.out.println("response: " + response);    
                     break; 
                 case "REGISTER":
-                    response = stub.register();
+                    response = stub.register(strings[1],strings[2]);
                     System.out.println("response: " + response); 
                     break;
+                /*    
                 case "CONSULT REQUEST":
                     response = stub.consultRequest();
                     System.out.println("response: " + response); 
@@ -45,7 +47,7 @@ public class client {
                 case "DATA":
                     response = stub.data();
                     System.out.println("response: " + response); 
-                    break;
+                    break;*/
             }
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
