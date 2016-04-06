@@ -10,9 +10,13 @@ public class AudioClient {
     try {
       Registry reg = LocateRegistry.getRegistry("localhost");
       stub = (Server) reg.lookup("AudioServer");
-      System.out.println(stub.sayHello());
-      RegisterPDU pdu = new RegisterPDU(1, "User", "localhost", 3000);
-      System.out.println(stub.registerUser(pdu.toString()));
+
+      RegisterPDU pdu = new RegisterPDU(1, "User", "password", "localhost", 3000);
+      if (stub.registerUser(pdu.toString())) {  // Sucessful registration.
+        System.out.println("Registration Sucessful.");
+      } else {
+        System.out.println("Username already taken.");
+      }
     } catch (Exception e) {
       System.out.println(e);
     }

@@ -1,4 +1,4 @@
-build: clean pdu
+build: clean
 
 pdu: src/PDU/PDUType.java src/PDU/PDU.java
 	mkdir build
@@ -9,3 +9,4 @@ pdutest: src/PDUTest.java
 
 clean: build/
 	rm -rf ./build
+	rm -rf src/*.class

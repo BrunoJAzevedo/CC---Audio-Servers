@@ -1,12 +1,17 @@
+/**
+ *  Server interface, defines the methods that should be
+ *  implemented by a class that whishes to serve as the server.
+ *
+ *  @author joaofcosta.
+ *  @date   06042016.
+ */
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import pdu.*;
 
-//Remote
 public interface Server extends Remote {
-  String sayHello() throws RemoteException;
-
-  String registerUser(String registerString) throws RemoteException;
+  Boolean registerUser(String pdu) throws RemoteException;
 
   /*
      String consultRequest() throws RemoteException;

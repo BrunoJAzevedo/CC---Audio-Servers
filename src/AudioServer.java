@@ -9,7 +9,8 @@ public class AudioServer {
 
   public static void main(String args[]) {
     try {
-      ServerImplementation sImp = new ServerImplementation("Server");
+      Users users = new Users();
+      ServerImplementation sImp = new ServerImplementation(users);
 
       Registry registry = LocateRegistry.getRegistry();
       registry.bind("AudioServer", sImp);

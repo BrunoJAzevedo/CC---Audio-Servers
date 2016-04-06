@@ -6,6 +6,7 @@ import java.util.Arrays;
 public class RegisterPDU extends PDU {
   int     registerType;
   String  id;
+  String  password;
   String  ip;
   int     port;
 
@@ -15,15 +16,17 @@ public class RegisterPDU extends PDU {
    *
    *  @param  registerType  Wether the user wants to login(1) or logout(0).
    *  @param  id            The client identifier.
+   *  @param  id            The client password.
    *  @param  ip            The client machine's IP address.
    *  @param  port          The port where to receive packets for the application.
    */
-  public RegisterPDU(int registerType, String id,String ip, int port) {
+  public RegisterPDU(int registerType, String id, String password, String ip, int port) {
     super(PDUType.REGISTER, new int[] {0,0,0,0});
     this.registerType = registerType;
-    this.id = id;
-    this.ip = ip;
-    this.port  = port;
+    this.id           = id;
+    this.password     = password;
+    this.ip           = ip;
+    this.port         = port;
   }
 
 
@@ -39,10 +42,11 @@ public class RegisterPDU extends PDU {
    *  @param  port          The port where to receive packets for the application.
    */
   public RegisterPDU(int version, int security, int[] options, int registerType, String id,
-      String ip, int port) {
+      String password, String ip, int port) {
     super(version, security, PDUType.REGISTER, options);
     this.registerType = registerType;
     this.id           = id;
+    this.password     = password;
     this.ip           = ip;
     this.port         = port;
   }
@@ -55,6 +59,9 @@ public class RegisterPDU extends PDU {
 
   /** @return Client id. */
   public String getID() { return this.id.toString(); }
+
+  /** @return Client id. */
+  public String getPassword() { return this.password.toString(); }
 
   /** @return Client machine's ip address. */
   public String getIP() { return this.ip.toString(); }
@@ -83,6 +90,14 @@ public class RegisterPDU extends PDU {
   }
 
   /**
+   *  Set the client password.
+   *  @param  id  The client password.
+   */
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  /**
    *  Set the ip address to where the response PDU should be sent.
    *  @param  ip  The machine's ip address.
    */
@@ -106,8 +121,9 @@ public class RegisterPDU extends PDU {
       sb.append(Arrays.toString(this.getOptions()) + "\n");
       sb.append(this.getRegisterType() + "\n");
       sb.append(this.getID() + "\n");
+      sb.append(this.getPassword() + "\n");
       sb.append(this.getIP() + "\n");
-      sb.append(this.getPort() + "\n");
+      sb.append(this.getPort());
 
       return sb.toString();
     }
