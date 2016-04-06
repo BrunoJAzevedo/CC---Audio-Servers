@@ -17,6 +17,10 @@ public class AudioClient {
       } else {
         System.out.println("Username already taken.");
       }
+
+      System.out.println(stub.loginUser(pdu.toString()));
+      pdu.setRegisterType(0);
+      stub.logoutUser(pdu.toString());
     } catch (Exception e) {
       System.out.println(e);
     }
