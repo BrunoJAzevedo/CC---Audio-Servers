@@ -2,7 +2,8 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-        
+import java.io.*;
+
 public class server implements Hello {
         
     public server() {}
@@ -13,11 +14,14 @@ public class server implements Hello {
     }
 
     //método register
-    public String register() {
-    
+     public String register(String login, String pass) {
+        System.err.println("Login bem feito");
+        System.err.println("Nome de utilizador: "+login);
+        System.err.println("Password **********");
+        return("Sucesso");
     }
         
-    //método consultRequest
+    /*método consultRequest
     public String consultRequest() {
 
     }
@@ -46,7 +50,7 @@ public class server implements Hello {
     public String data(){
 
     }
-
+    */
     //servidor
     public static void main(String args[]) {
         
