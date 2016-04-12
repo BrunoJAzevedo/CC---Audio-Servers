@@ -13,7 +13,7 @@ public class server implements Hello {
         return "Hello, world!";
     }
 
-    //método register
+    //Receives a RegisterPDU to authenticate user
      public String register(String login, String pass) {
         System.err.println("Login bem feito");
         System.err.println("Nome de utilizador: "+login);

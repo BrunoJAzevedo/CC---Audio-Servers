@@ -16,11 +16,12 @@ public class client {
             String[] strings = command.split(" ");
             switch(strings[0]) {
                 case "HELLO":
-                    response = stub.sayHello();
                     System.out.println("response: " + response);
                     break;
+                //register login/logout id 
                 case "REGISTER":
-                    response = stub.register(strings[1],strings[2]);
+                    RegisterPDU register = new RegisterPDU(strings[0],strings[1],"198.000.001",20);                
+                    response = stub.register(register);
                     System.out.println("response: " + response);
                     break;
                 /*
