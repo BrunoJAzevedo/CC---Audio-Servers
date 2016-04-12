@@ -1,5 +1,8 @@
 package pdu;
 
+import java.lang.StringBuilder;
+import java.util.Arrays;
+
 public class RegisterPDU extends PDU {
   int     registerType;
   String  id;
@@ -94,4 +97,18 @@ public class RegisterPDU extends PDU {
   public void setPort(int port) {
     this.port = port;
   }
+
+  @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append(this.getVersion() + "\n");
+      sb.append(this.getSecurity() + "\n");
+      sb.append(Arrays.toString(this.getOptions()) + "\n");
+      sb.append(this.getRegisterType() + "\n");
+      sb.append(this.getID() + "\n");
+      sb.append(this.getIP() + "\n");
+      sb.append(this.getPort() + "\n");
+
+      return sb.toString();
+    }
 }
