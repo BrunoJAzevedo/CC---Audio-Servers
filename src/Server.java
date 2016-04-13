@@ -6,43 +6,38 @@
  *  @date   06042016.
  */
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import pdu.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-public interface Server extends Remote {
-  /** Register a new user.
-   *
-   *  @param  pdu A string from the RegisterPDU `toString`.
-   *  @return True if registration was sucessfull, false otherwise.
-   */
-  Boolean registerUser(String pdu) throws RemoteException;
+import java.lang.System;
+import java.lang.Runtime;
 
-  /** Login a user.
-   *
-   *  @param  pdu A string from the RegisterPDU `toString`.
-   *  @return True if login was sucessfull, false otherwise.
-   */
-  Boolean loginUser(String pdu) throws RemoteException;
+public class Server {
+  private final Users users;
+  private final ServerSocket ssocket;
 
-  /** Logout a user.
-   *
-   *  @param  pdu A string from the RegisterPDU `toString`.
-   */
-  void logoutUser(String pdu) throws RemoteException;
+  public Server(int port) throws IOException {
+    this.ssocket  = new ServerSocket(port);
+    this.users    = new Users();
+  }
 
-  /*
-     String consultRequest() throws RemoteException;
+  public void run() {
+    Socket        socket;
+    ServerThread  sthread;
 
-     String consultResponse() throws RemoteException;
+    try {
+      // Aceitar ligações dos users e atribuir uma thread a cada um.
+      System.out.println("Servidor Online.");
 
-     String probeRequest() throws RemoteException;
-
-     String probeResponse() throws RemoteException;
-
-     String request() throws RemoteException;
-
-     String data() throws RemoteException;
-     */
-
+      while ((socket = ssocket.accept()) != null) {
+        sthread = new ServerThread(socket, this);
+        sthread.start();
+      }
+    } catch (Exception e) {
+      System.out.println("Erro: " + e);
+    }
+  }
 }

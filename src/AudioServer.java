@@ -1,23 +1,13 @@
-import java.rmi.registry.Registry;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
-import java.io.*;
-
 public class AudioServer {
-  public AudioServer() {}
+  public final static int TCP_PORT  = 8080;
 
   public static void main(String args[]) {
     try {
-      Users users = new Users();
-      ServerImplementation sImp = new ServerImplementation(users);
-
-      Registry registry = LocateRegistry.getRegistry();
-      registry.bind("AudioServer", sImp);
-      System.out.println("AudioServer is listening...");
+      // Criar servidor e correr.
+      Server server = new Server(TCP_PORT);
+      server.run();
     } catch (Exception e) {
-      System.err.println("Server exception thrown: " + e.toString());
-      e.printStackTrace();
+      System.out.println("Erro: " + e);
     }
   }
 }
