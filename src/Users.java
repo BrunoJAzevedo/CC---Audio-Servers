@@ -52,8 +52,8 @@ public class Users {
       throw new UserRegisteredException("This username is already taken.");
     } else {
       try {
-        String hashedPassword = SHA256HashCalculator(password);
-        users.put(user, hashedPassword);
+        //String hashedPassword = SHA256HashCalculator(password);
+        users.put(user, password);
       } catch (Exception e) {
         throw new Exception("Password Hashing Failed");
       }
@@ -68,24 +68,24 @@ public class Users {
    *  @return true if the login suceeded, false if the user does not exist or if the user
    *          is currently logged in.
    */
-  public Boolean loginUser(String username, String password) {
+  public Boolean loginUser(String username, String password)
+    throws UserRegisteredException, Exception {
     String user = username.toLowerCase();
 
-    if (!users.containsKey(user))     { return false; }
-    else if (state.containsKey(user)) { return false; }
-    else {
-      try {
-        String hashedPassword = SHA256HashCalculator(password);
-        String savedPassword  = (String) users.get(user);
+    if (!users.containsKey(user))     { this.registerUser(username, password); }
+    else if (state.containsKey(user)) { this.registerUser(username, password); }
 
-        if (savedPassword.equals(hashedPassword)) {
-          // Mark the user as logged in.
-          state.put(user, true);
-          return true;
-        } else { return false; }
-      } catch (Exception e) {
-        return false;
-      }
+    try {
+      //String hashedPassword = SHA256HashCalculator(password);
+      String savedPassword  = (String) users.get(user);
+
+      if (savedPassword.equals(password)) {
+        // Mark the user as logged in.
+        state.put(user, true);
+        return true;
+      } else { return false; }
+    } catch (Exception e) {
+      return false;
     }
   }
 

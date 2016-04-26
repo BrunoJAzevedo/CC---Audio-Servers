@@ -118,6 +118,7 @@ public class RegisterPDU extends PDU {
       StringBuilder sb = new StringBuilder();
       sb.append(this.getVersion() + "\n");
       sb.append(this.getSecurity() + "\n");
+      sb.append(this.getType() + "\n");
       sb.append(Arrays.toString(this.getOptions()) + "\n");
       sb.append(this.getRegisterType() + "\n");
       sb.append(this.getID() + "\n");

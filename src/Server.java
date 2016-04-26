@@ -40,4 +40,14 @@ public class Server {
       System.out.println("Erro: " + e);
     }
   }
+
+  public synchronized Boolean loginUser(String username, String password)
+    throws UserRegisteredException, Exception {
+    return this.users.loginUser(username, password);
+  }
+
+  public synchronized void logoutUser(String username) {
+    this.users.logoutUser(username);
+  }
+
 }
