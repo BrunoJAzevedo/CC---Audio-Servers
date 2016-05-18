@@ -7,7 +7,9 @@
 
 package pdu;
 
-class ConsultRequestPDU extends PDU {
+import java.util.Arrays;
+
+public class ConsultRequestPDU extends PDU {
   private String band;
   private String song;
   private String extension;
@@ -78,4 +80,18 @@ class ConsultRequestPDU extends PDU {
    *  @param  extension The file's extension.
    */
   public void setExtension(String extension) { this.extension = extension.toString(); }
+
+  @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append(this.getVersion() + "\n");
+      sb.append(this.getSecurity() + "\n");
+      sb.append(this.getType() + "\n");
+      sb.append(Arrays.toString(this.getOptions()) + "\n");
+      sb.append(this.getBand() + "\n");
+      sb.append(this.getSong() + "\n");
+      sb.append(this.getExtension());
+
+      return sb.toString();
+    }
 }

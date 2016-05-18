@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import pdu.PDUType;
+import pdu.*;
 
 public class ServerThread extends Thread {
   private final Socket          socket;
@@ -56,6 +56,9 @@ public class ServerThread extends Thread {
     case 1:   // FIXME: Utilizar a classe PDUType.
       parseRegisterPDU();
       break;
+    case 2:
+      parseConsultRequestPDU();
+      break;
     default:  // FIXME: <-- Limpar o reader caso não seja um PDU.
       break;
     }
@@ -88,6 +91,27 @@ public class ServerThread extends Thread {
         writer.println("OK");
         writer.flush();
       }
+    } catch (Exception e) {
+      System.out.println(e);
+      writer.println("Oops! Algo de errado se passou.");
+      writer.flush();
+    }
+  }
+
+  private void parseConsultRequestPDU() {
+    try {
+      String band;
+      String song;
+      String extension;
+
+      band      = reader.readLine();
+      song      = reader.readLine();
+      extension = reader.readLine();
+
+      // Responde informando que não encontrou o ficheiro.
+      ConsultResponsePDU response = new ConsultResponsePDU(0, 0, "", "", 0);
+      writer.println(response.toString());
+      writer.flush();
     } catch (Exception e) {
       System.out.println(e);
       writer.println("Oops! Algo de errado se passou.");

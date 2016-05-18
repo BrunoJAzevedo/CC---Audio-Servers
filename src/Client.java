@@ -7,25 +7,28 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import pdu.RegisterPDU;
 import java.net.InetAddress;
+import pdu.*;
 
 public class Client {
   private static final int TCP_PORT = 8080;
 
+  // Regex related variables.
   private static final String regex[] = {
     "LOGIN ([A-Za-z0-9]*) ([A-Za-z0-9]*)",
-    "LOGOUT"
+    "LOGOUT",
+    "REQUEST \\(([A-Za-z0-9 ]*)\\) \\(([A-Za-z0-9 ]*)\\) ([A-Za-z0-9]*)"
   };
-  public static final int CLIENT_LOGIN     = 0;
-  public static final int CLIENT_LOGOUT    = 1;
-
   private static Matcher matcher;
   private static Pattern pattern;
+  public static final int CLIENT_LOGIN      = 0;
+  public static final int CLIENT_LOGOUT     = 1;
+  public static final int CONSULT_REQUEST   = 2;
 
   public static void main(String args[]) throws IOException {
-    String          ip = InetAddress.getLocalHost().getHostAddress().toString();
-    String          username = "";
+    String          ip        = InetAddress.getLocalHost().getHostAddress().toString();
+    String          username  = "";
+    boolean         logged    = false;
     Socket          socket;
     PrintWriter     writer;
     BufferedReader  reader;
@@ -52,18 +55,40 @@ public class Client {
             socket.getPort()).toString());
           writer.flush();
           username  = matcher.group(1);
-          System.out.println(reader.readLine());
+          if (reader.readLine().equals("OK")) {
+            logged = true;
+            System.out.println("Conectado com sucesso!");
+          } else {
+            System.out.println("Erro no login.");
+          }
           break;
         case CLIENT_LOGOUT:
-          writer.println(new RegisterPDU(0, username, "", ip,
-            socket.getPort()).toString());
-          writer.flush();
-          System.out.println(reader.readLine());
+          if (logged) {
+            writer.println(new RegisterPDU(0, username, "", ip,
+              socket.getPort()).toString());
+            writer.flush();
+            logged = false;
+            System.out.println("Logout com sucesso!");
+          } else {
+            System.out.println("Sem sessão iniciada!");
+          }
+          break;
+        case CONSULT_REQUEST:
+          if (logged) {
+            writer.println(new ConsultRequestPDU(matcher.group(1),
+                  matcher.group(2), matcher.group(3)).toString());
+            writer.flush();
+            parseConsultResponse(reader);
+          } else {
+            System.out.println("Sem sessão iniciada!");
+          }
           break;
         default:
           System.out.println("Comando Inválido.");
           break;
         }
+
+        System.out.println("----------");
       }
 
       writer.close();
@@ -87,5 +112,25 @@ public class Client {
     }
 
     return -1;
+  }
+
+  /** Parse the consult response PDU. */
+  public static void parseConsultResponse(BufferedReader reader) {
+    try {
+      int version     = Integer.parseInt(reader.readLine());
+      int security    = Integer.parseInt(reader.readLine());
+      int type        = Integer.parseInt(reader.readLine());
+      String options  = reader.readLine();
+      String found    = reader.readLine();
+      int clients     = Integer.parseInt(reader.readLine());
+      String id       = reader.readLine();
+      String ip       = reader.readLine();
+      int port        = Integer.parseInt(reader.readLine());
+
+      if (found.equals("false")) { System.out.println("Música não encontrada..."); }
+      else  { System.out.println("Música encontrada no: " + ip + ":" + port); }
+    } catch (Exception e) {
+      System.out.println(e);
+    }
   }
 }

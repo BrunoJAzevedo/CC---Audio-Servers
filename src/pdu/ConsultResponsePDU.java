@@ -7,7 +7,9 @@
 
 package pdu;
 
-class ConsultResponsePDU extends PDU {
+import java.util.Arrays;
+
+public class ConsultResponsePDU extends PDU {
   private int     found;
   private int     clients;
   private String  id;
@@ -110,4 +112,20 @@ class ConsultResponsePDU extends PDU {
    *  @param  port  The client's port.
    */
   public void setPort(int port) { this.port = port; }
+
+  @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append(this.getVersion() + "\n");
+      sb.append(this.getSecurity() + "\n");
+      sb.append(this.getType() + "\n");
+      sb.append(Arrays.toString(this.getOptions()) + "\n");
+      sb.append(this.wasFound() + "\n");
+      sb.append(this.getClients() + "\n");
+      sb.append(this.getID() + "\n");
+      sb.append(this.getIP() + "\n");
+      sb.append(this.getPort());
+
+      return sb.toString();
+    }
 }
