@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Set;
+import java.util.Iterator;
 import pdu.*;
 
 public class ServerThread extends Thread {
@@ -11,6 +13,7 @@ public class ServerThread extends Thread {
   private final Server          server;
   private final BufferedReader  reader;
   private final PrintWriter     writer;
+  private String                username;
 
   public ServerThread(Socket socket, Server server) throws IOException {
     this.socket = socket;
@@ -64,10 +67,11 @@ public class ServerThread extends Thread {
     }
   }
 
+  /** Interpretar o PDU de registo, login e logout enviado por um cliente e responder
+   *  de forma apropriada. */
   private void parseRegisterPDU() {
     try {
       int type;
-      String username;
       String password;
       String ip;
       int port;
@@ -79,7 +83,7 @@ public class ServerThread extends Thread {
       port      = Integer.parseInt(reader.readLine());
 
       if (type == 1) {  // Login/Registo.
-        if (server.loginUser(username, password)) {
+        if (server.loginUser(username, password, socket)) {
           writer.println("OK");
           writer.flush();
         } else {
@@ -98,6 +102,8 @@ public class ServerThread extends Thread {
     }
   }
 
+  /** Interpreta um PDU do tipo CONSULT_REQUEST e pergunta aos seus clientes se têm
+   *  o ficheiro que outro cliente necessita. */
   private void parseConsultRequestPDU() {
     try {
       String band;
@@ -108,8 +114,34 @@ public class ServerThread extends Thread {
       song      = reader.readLine();
       extension = reader.readLine();
 
+      System.out.println(band + " - " + song + "." + extension);
+
+      // Create new CONSULT_REQUEST PDU to send to every connected user.
+      ConsultRequestPDU request = new ConsultRequestPDU(band, song, extension);
+      Set<String> usernames     = server.getUsernames();
+      Iterator  it              = usernames.iterator();
+
+      // Percorrer lista de usernames e enviar o consult request a todos.
+      while (it.hasNext()) {
+        String user     = (String) it.next();
+
+        if (user != username) {
+          Socket socket   = server.getUserSocket(user);
+          System.out.println(socket.toString());
+
+          if (socket != null) {
+            PrintWriter w = new PrintWriter(socket.getOutputStream());
+
+            System.out.println("A consultar user: " + user);
+            w.println(request.toString());
+            w.flush();
+          }
+        }
+      }
+
       // Responde informando que não encontrou o ficheiro.
       ConsultResponsePDU response = new ConsultResponsePDU(0, 0, "", "", 0);
+      System.out.println(response.toString());
       writer.println(response.toString());
       writer.flush();
     } catch (Exception e) {

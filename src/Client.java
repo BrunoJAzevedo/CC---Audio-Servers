@@ -12,6 +12,7 @@ import pdu.*;
 
 public class Client {
   private static final int TCP_PORT = 8080;
+  private static final String HOST  = "localhost";
 
   // Regex related variables.
   private static final String regex[] = {
@@ -33,9 +34,10 @@ public class Client {
     PrintWriter     writer;
     BufferedReader  reader;
     Scanner         scanner;
+    ClientThread    thread;
 
     try {
-      socket  = new Socket("localhost", TCP_PORT);
+      socket  = new Socket(HOST, TCP_PORT);
       writer  = new PrintWriter(socket.getOutputStream());
       reader  = new BufferedReader(new InputStreamReader(
           socket.getInputStream(), "UTF-8"));
@@ -56,8 +58,10 @@ public class Client {
           writer.flush();
           username  = matcher.group(1);
           if (reader.readLine().equals("OK")) {
-            logged = true;
+            logged  = true;
+            thread  = new ClientThread(reader, writer, username);
             System.out.println("Conectado com sucesso!");
+            thread.start();
           } else {
             System.out.println("Erro no login.");
           }
@@ -67,18 +71,18 @@ public class Client {
             writer.println(new RegisterPDU(0, username, "", ip,
               socket.getPort()).toString());
             writer.flush();
-            logged = false;
             System.out.println("Logout com sucesso!");
+            logged = false;
           } else {
             System.out.println("Sem sessão iniciada!");
           }
+          // TODO: Matar a thread que está a correr em background.
           break;
         case CONSULT_REQUEST:
           if (logged) {
             writer.println(new ConsultRequestPDU(matcher.group(1),
                   matcher.group(2), matcher.group(3)).toString());
             writer.flush();
-            parseConsultResponse(reader);
           } else {
             System.out.println("Sem sessão iniciada!");
           }
@@ -112,25 +116,5 @@ public class Client {
     }
 
     return -1;
-  }
-
-  /** Parse the consult response PDU. */
-  public static void parseConsultResponse(BufferedReader reader) {
-    try {
-      int version     = Integer.parseInt(reader.readLine());
-      int security    = Integer.parseInt(reader.readLine());
-      int type        = Integer.parseInt(reader.readLine());
-      String options  = reader.readLine();
-      String found    = reader.readLine();
-      int clients     = Integer.parseInt(reader.readLine());
-      String id       = reader.readLine();
-      String ip       = reader.readLine();
-      int port        = Integer.parseInt(reader.readLine());
-
-      if (found.equals("false")) { System.out.println("Música não encontrada..."); }
-      else  { System.out.println("Música encontrada no: " + ip + ":" + port); }
-    } catch (Exception e) {
-      System.out.println(e);
-    }
   }
 }

@@ -9,6 +9,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Set;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.lang.System;
@@ -40,13 +41,21 @@ public class Server {
     }
   }
 
-  public synchronized Boolean loginUser(String username, String password)
+  public synchronized Boolean loginUser(String username, String password, Socket socket)
     throws UserRegisteredException, Exception {
-    return this.users.loginUser(username, password);
+    return this.users.loginUser(username, password, socket);
   }
 
   public synchronized void logoutUser(String username) {
     this.users.logoutUser(username);
+  }
+
+  public synchronized Set<String> getUsernames() {
+    return users.getUsernames();
+  }
+
+  public synchronized Socket getUserSocket(String username) {
+    return users.getUserSocket(username);
   }
 
 }

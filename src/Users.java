@@ -1,24 +1,30 @@
 /**
- *  Class responsible for saving usernames and passwords.
+ *  Class responsible for saving the mapping between usernames and passwords,
+ *  usernames and sockets and usernames and the connection state.
  *
  *  @date   30032016
  *  @author ajfc
  */
 
+import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.Set;
+import java.net.Socket;
 
 public class Users {
   // Map between username and password.
   private HashMap<String, String> users;
+  // Map between username and socket.
+  private HashMap<String, Socket> sockets;
   // Map between username and session state, the state is set to true if the user is logged in.
   private HashMap<String, Boolean> state;
 
   public Users() {
-    users = new HashMap<String, String>();
-    state = new HashMap<String, Boolean>();
+    users   = new HashMap<String, String>();
+    sockets = new HashMap<String, Socket>();
+    state   = new HashMap<String, Boolean>();
   }
 
 
@@ -68,7 +74,7 @@ public class Users {
    *  @return true if the login suceeded, false if the user does not exist or if the user
    *          is currently logged in.
    */
-  public Boolean loginUser(String username, String password)
+  public Boolean loginUser(String username, String password, Socket socket)
     throws UserRegisteredException, Exception {
     String user = username.toLowerCase();
 
@@ -82,11 +88,23 @@ public class Users {
       if (savedPassword.equals(password)) {
         // Mark the user as logged in.
         state.put(user, true);
+        // Save the user's socket.
+        sockets.put(user, socket);
         return true;
       } else { return false; }
     } catch (Exception e) {
       return false;
     }
+  }
+
+  /** Get the username socket.
+   *
+   *  @param  username  The user's username, case insentive.
+   */
+  public Socket getUserSocket(String username) {
+    if (!sockets.containsKey(username)) { return null; }
+    Socket s = sockets.get(username);
+    return s;
   }
 
   /** Logout the user from the system.
@@ -97,5 +115,10 @@ public class Users {
     String user = username.toLowerCase();
 
     if (state.containsKey(user)) { state.remove(user); }
+  }
+
+  /** Get list of all usernames. */
+  public Set<String> getUsernames() {
+    return sockets.keySet();
   }
 }
