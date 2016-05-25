@@ -1,34 +1,63 @@
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 class UDPServidor
 {
    public static void main(String args[]) throws Exception
    {
-      DatagramSocket serverSocket = new DatagramSocket(9876);
-      byte[] receiveData = new byte[1024];
-      byte[] sendData = new byte[1024];
+      FileInputStream in = null;
       FileOutputStream out = null;
-      int i = 1;
+      
+      DatagramSocket clientSocket = new DatagramSocket();
+      InetAddress IPAddress = InetAddress.getByName("localhost");
+      byte[] sendData = new byte[100];
+      byte[] receiveData = new byte[1024];
+      int c, i = 0, j = 0;
+      ArrayList<Integer> al = new ArrayList<Integer>();
       try{
-         out = new FileOutputStream("testar.mp3");
-         while(i == 1)
-         {
-            StringBuilder sb = new StringBuilder();
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            serverSocket.receive(receivePacket);
-            String sentence = new String(receivePacket.getData());
-            sb.append(sentence);
-            int c = Integer.parseInt(sentence.trim());
-            System.out.println(c);
-            if(sentence.equals("end")) i = 0;   
-            else out.write(c);
-         }     
-         out.close();
-      }finally{
-         if (out != null) {
-            out.close();
+         in = new FileInputStream("000001.mp3");
+         while((c = in.read()) != -1){ 
+            al.add(c); 
+            j++;
          }
+
+         String ack = "begin";
+         sendData = ack.getBytes();
+         DatagramPacket sendAck = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+         clientSocket.send(sendAck);
+         System.out.println("ACK -> "+ack);
+         //answer ack
+         DatagramPacket receiveAck = new DatagramPacket(receiveData, receiveData.length);
+         clientSocket.receive(receiveAck);
+         String answer = new String(receiveAck.getData(),0,receiveAck.getLength());
+         //begin transfer
+         if(answer.contains("ok")){
+            while(true){
+               System.out.println(i + " " + j);
+               if(i<j){
+                  sendData = al.get(i).toString().getBytes();
+                  DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+                  clientSocket.send(sendPacket);
+
+                  DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                  clientSocket.receive(receivePacket);
+                  answer = new String(receivePacket.getData(),0,receivePacket.getLength() );
+
+                  if(answer.contains("ok")) i++;
+               } else{
+                  System.out.println("end");
+                  sendData = "end".getBytes();
+                  DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+                  clientSocket.send(sendPacket);
+
+                  break;
+               }
+            }
+         }
+         clientSocket.close();
+      }catch(Exception e){
+         System.err.println(e);
       }
    }
 }
