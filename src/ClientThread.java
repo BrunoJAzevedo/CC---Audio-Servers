@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.File;
 import java.net.Socket;
 import pdu.*;
 
@@ -101,7 +102,13 @@ public class ClientThread extends Thread {
       song      = reader.readLine();
       extension = reader.readLine();
 
-      System.out.println(band + " - " + song + "." + extension);
+      // Verificar se a música está na pasta /music.
+      File f = new File("music/" + band + " - " + song + "." + extension);
+      System.out.println(f.toString());
+      if (f.exists() && !f.isDirectory()) {
+        System.out.println("Ficheiro encontrado.");
+      }
+
     } catch (Exception e) {
       System.out.println(e);
     }

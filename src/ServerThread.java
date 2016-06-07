@@ -130,6 +130,7 @@ public class ServerThread extends Thread {
           System.out.println(socket.toString());
 
           if (socket != null) {
+            // Enviar consult request a todos os clientes e verificar se algum têm música.
             PrintWriter w = new PrintWriter(socket.getOutputStream());
 
             System.out.println("A consultar user: " + user);
