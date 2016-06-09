@@ -102,7 +102,7 @@ public class Users {
    *  @param  username  The user's username, case insentive.
    */
   public Socket getUserSocket(String username) {
-    if (!sockets.containsKey(username)) { return null; }
+    if (!sockets.containsKey(username) || !state.containsKey(username)) { return null; }
     Socket s = sockets.get(username);
     return s;
   }

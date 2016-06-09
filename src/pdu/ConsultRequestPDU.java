@@ -22,7 +22,7 @@ public class ConsultRequestPDU extends PDU {
    *  @param  extension The audio file extension, e.g., "mp3".
    */
   public ConsultRequestPDU (String band, String song, String extension) {
-    super(PDUType.CONSULT_REQUEST, new int[] {0,0,0,0});
+    super(2, new int[] {0,0,0,0});
     this.band       = band;
     this.song       = song;
     this.extension  = extension;
@@ -41,7 +41,7 @@ public class ConsultRequestPDU extends PDU {
    */
   public ConsultRequestPDU (int version, int security, int[] options, String band,
       String song, String extension) {
-    super(version, security, PDUType.CONSULT_REQUEST, options);
+    super(version, security, 2, options);
     this.band       = band;
     this.song       = song;
     this.extension  = extension;

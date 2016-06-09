@@ -30,14 +30,16 @@ public class Client {
     String          ip        = InetAddress.getLocalHost().getHostAddress().toString();
     String          username  = "";
     boolean         logged    = false;
-    Socket          socket;
+    Socket          socket, consult_socket;
     PrintWriter     writer;
     BufferedReader  reader;
     Scanner         scanner;
     ClientThread    thread;
 
     try {
-      socket  = new Socket(HOST, TCP_PORT);
+      socket          = new Socket(HOST, TCP_PORT);
+      // Criar novo socket que será apenas usado para consultar ficheiros.
+      consult_socket  = new Socket(HOST, TCP_PORT);
       writer  = new PrintWriter(socket.getOutputStream());
       reader  = new BufferedReader(new InputStreamReader(
           socket.getInputStream(), "UTF-8"));
@@ -59,7 +61,7 @@ public class Client {
           username  = matcher.group(1);
           if (reader.readLine().equals("OK")) {
             logged  = true;
-            thread  = new ClientThread(reader, writer, username);
+            thread  = new ClientThread(consult_socket, username);
             System.out.println("Conectado com sucesso!");
             thread.start();
           } else {
@@ -73,6 +75,7 @@ public class Client {
             writer.flush();
             System.out.println("Logout com sucesso!");
             logged = false;
+            System.exit(0);
           } else {
             System.out.println("Sem sessão iniciada!");
           }
@@ -83,6 +86,22 @@ public class Client {
             writer.println(new ConsultRequestPDU(matcher.group(1),
                   matcher.group(2), matcher.group(3)).toString());
             writer.flush();
+            try {
+              int version     = Integer.parseInt(reader.readLine());
+              int security    = Integer.parseInt(reader.readLine());
+              int type        = Integer.parseInt(reader.readLine());
+              String options  = reader.readLine();
+              int found       = Integer.parseInt(reader.readLine());
+              int clients     = Integer.parseInt(reader.readLine());
+              String id       = reader.readLine();
+              String c_ip     = reader.readLine();
+              int port        = Integer.parseInt(reader.readLine());
+
+              if (found == 0) { System.out.println("Música não encontrada..."); }
+              else  { System.out.println("Música encontrada no: " + c_ip + ":" + port); }
+            } catch (Exception e) {
+              System.out.println(e);
+            }
           } else {
             System.out.println("Sem sessão iniciada!");
           }

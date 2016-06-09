@@ -26,6 +26,7 @@ public class Server {
 
   public void run() {
     Socket        socket;
+    Socket        consult_socket;
     ServerThread  sthread;
 
     try {
@@ -33,7 +34,9 @@ public class Server {
       System.out.println("Servidor Online.");
 
       while ((socket = ssocket.accept()) != null) {
-        sthread = new ServerThread(socket, this);
+        consult_socket  = ssocket.accept();
+        sthread         = new ServerThread(consult_socket, socket, this);
+        System.out.println("Nova ligação de: " + socket.toString());
         sthread.start();
       }
     } catch (Exception e) {

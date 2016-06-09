@@ -10,17 +10,19 @@ import pdu.*;
 
 public class ServerThread extends Thread {
   private final Socket          socket;
+  private final Socket          consult_socket;
   private final Server          server;
   private final BufferedReader  reader;
   private final PrintWriter     writer;
   private String                username;
 
-  public ServerThread(Socket socket, Server server) throws IOException {
-    this.socket = socket;
-    this.server = server;
-    this.reader = new BufferedReader(new InputStreamReader(
-          socket.getInputStream(), "UTF-8"));
-    this.writer = new PrintWriter(socket.getOutputStream(), true);
+  public ServerThread(Socket consult_socket, Socket socket, Server server) throws IOException {
+    this.socket         = socket;
+    this.consult_socket = consult_socket;
+    this.server         = server;
+    this.reader         = new BufferedReader(new InputStreamReader(
+      socket.getInputStream(), "UTF-8"));
+    this.writer         = new PrintWriter(socket.getOutputStream(), true);
   }
 
   public void run() {
@@ -34,19 +36,18 @@ public class ServerThread extends Thread {
     try {
       // Parse first 4 parameters to check what is the PDU type.
       while ((message = reader.readLine()) != null) {
-        System.out.println(message);
         switch(i) {
-        case 0: // Version.
-          version   = Integer.parseInt(message); i++; break;
-        case 1: // Security.
-          security  = Integer.parseInt(message); i++; break;
-        case 2: // Type.
-          type      = Integer.parseInt(message); i++; break;
-        case 3: // Options.
-          options   = message.toString(); i = 0;
-          parsePDUData(version, security, type, options); break;
-        default:
-          break;
+          case 0: // Version.
+            version   = Integer.parseInt(message); i++; break;
+          case 1: // Security.
+            security  = Integer.parseInt(message); i++; break;
+          case 2: // Type.
+            type      = Integer.parseInt(message); i++; break;
+          case 3: // Options.
+            options   = message.toString(); i = 0;
+            parsePDUData(version, security, type, options); break;
+          default:
+            break;
         }
       }
     } catch (Exception e) {
@@ -83,17 +84,18 @@ public class ServerThread extends Thread {
       port      = Integer.parseInt(reader.readLine());
 
       if (type == 1) {  // Login/Registo.
-        if (server.loginUser(username, password, socket)) {
+        if (server.loginUser(username, password, consult_socket)) {
           writer.println("OK");
           writer.flush();
         } else {
           writer.println("Erro");
           writer.flush();
         }
-      } else {          // Logout.
+      } else { // Logout.
+        Socket s      = server.getUserSocket(username);
+        PrintWriter w = new PrintWriter(s.getOutputStream());
+        w.println("OK"); w.flush();
         server.logoutUser(username);
-        writer.println("OK");
-        writer.flush();
       }
     } catch (Exception e) {
       System.out.println(e);
@@ -120,29 +122,43 @@ public class ServerThread extends Thread {
       ConsultRequestPDU request = new ConsultRequestPDU(band, song, extension);
       Set<String> usernames     = server.getUsernames();
       Iterator  it              = usernames.iterator();
+      String    ip = "", user = "", found;
+      ConsultResponsePDU response;
 
       // Percorrer lista de usernames e enviar o consult request a todos.
       while (it.hasNext()) {
-        String user     = (String) it.next();
+        user = (String) it.next();
 
         if (user != username) {
-          Socket socket   = server.getUserSocket(user);
-          System.out.println(socket.toString());
+          Socket socket = server.getUserSocket(user);
 
           if (socket != null) {
-            // Enviar consult request a todos os clientes e verificar se algum têm música.
-            PrintWriter w = new PrintWriter(socket.getOutputStream());
+            // Enviar consult request ao cliente e verificar se têm música.
+            PrintWriter w     = new PrintWriter(socket.getOutputStream());
+            BufferedReader r  = new BufferedReader(new InputStreamReader(
+              socket.getInputStream(), "UTF-8"));
 
-            System.out.println("A consultar user: " + user);
+            System.out.println("A consultar user: " + user + " -- " + socket.toString());
             w.println(request.toString());
             w.flush();
+
+            // Verificar se cliente diz "FOUND" (tem ficheiro) ou "NOT FOUND" não tem ficheiro.
+            found = r.readLine();
+            System.out.println(user + " -> " + found);
+
+            if (found.equals("FOUND")) {  // Ficheiro encontrado, adicionar ip à lista.
+              ip = socket.getLocalAddress().toString();
+            }
           }
         }
       }
 
       // Responde informando que não encontrou o ficheiro.
-      ConsultResponsePDU response = new ConsultResponsePDU(0, 0, "", "", 0);
-      System.out.println(response.toString());
+      if (ip.equals("")) {
+        response = new ConsultResponsePDU(0, 0, "", "", 0);
+      } else {
+        response = new ConsultResponsePDU(1, 0, user, ip, 8081);
+      }
       writer.println(response.toString());
       writer.flush();
     } catch (Exception e) {
@@ -151,5 +167,4 @@ public class ServerThread extends Thread {
       writer.flush();
     }
   }
-
 }

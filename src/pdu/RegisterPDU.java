@@ -21,7 +21,7 @@ public class RegisterPDU extends PDU {
    *  @param  port          The port where to receive packets for the application.
    */
   public RegisterPDU(int registerType, String id, String password, String ip, int port) {
-    super(PDUType.REGISTER, new int[] {0,0,0,0});
+    super(1, new int[] {0,0,0,0});
     this.registerType = registerType;
     this.id           = id;
     this.password     = password;
@@ -43,7 +43,7 @@ public class RegisterPDU extends PDU {
    */
   public RegisterPDU(int version, int security, int[] options, int registerType, String id,
       String password, String ip, int port) {
-    super(version, security, PDUType.REGISTER, options);
+    super(version, security, 1, options);
     this.registerType = registerType;
     this.id           = id;
     this.password     = password;

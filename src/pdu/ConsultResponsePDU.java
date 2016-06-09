@@ -27,7 +27,7 @@ public class ConsultResponsePDU extends PDU {
    *  @param  port    The client's port where PDUs should be sent.
    */
   public ConsultResponsePDU (int found, int clients, String id, String ip, int port) {
-    super(PDUType.CONSULT_RESPONSE, new int[] {0,0,0,0});
+    super(3, new int[] {0,0,0,0});
     this.found    = found;
     this.clients  = clients;
     this.id       = id;
@@ -51,7 +51,7 @@ public class ConsultResponsePDU extends PDU {
    */
   public ConsultResponsePDU (int version, int security, int[] options, int found,
       int clients, String id, String ip, int port) {
-    super(version, security, PDUType.CONSULT_RESPONSE, options);
+    super(version, security, 3, options);
     this.found    = found;
     this.clients  = clients;
     this.id       = id;
@@ -62,7 +62,7 @@ public class ConsultResponsePDU extends PDU {
   // Getters.
 
   /** @return True if the file was found. */
-  public boolean wasFound() { return this.found == 1; }
+  public int getFound() { return this.found; }
 
   /** @return The number of clients that have the file. */
   public int getClients() { return this.clients; }
@@ -116,11 +116,11 @@ public class ConsultResponsePDU extends PDU {
   @Override
     public String toString() {
       StringBuilder sb = new StringBuilder();
-      sb.append(this.getVersion() + "\n");
-      sb.append(this.getSecurity() + "\n");
-      sb.append(this.getType() + "\n");
-      sb.append(Arrays.toString(this.getOptions()) + "\n");
-      sb.append(this.wasFound() + "\n");
+      sb.append("1\n");
+      sb.append("0\n");
+      sb.append("3\n");
+      sb.append("[0,0,0,0]\n");
+      sb.append(this.getFound() + "\n");
       sb.append(this.getClients() + "\n");
       sb.append(this.getID() + "\n");
       sb.append(this.getIP() + "\n");

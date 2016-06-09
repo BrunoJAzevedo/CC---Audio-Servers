@@ -14,10 +14,10 @@ public abstract class PDU {
    *  @param  options   Aditional pdu options.
    *  @return An instance of a PDU.
    */
-  public PDU(PDUType type, int options[]) {
+  public PDU(int type, int options[]) {
     this.version  = 1;
     this.security = 0;
-    this.type     = type.value();
+    this.type     = type;
     this.options  = options;
   }
 
@@ -30,10 +30,10 @@ public abstract class PDU {
    *  @param  options   Aditional pdu options.
    *  @return An instance of a PDU.
    */
-  public PDU(int version, int security, PDUType type, int options[]) {
+  public PDU(int version, int security, int type, int options[]) {
     this.version  = version;
     this.security = security;
-    this.type     = type.value();
+    this.type     = type;
     this.options  = options;
   }
 

@@ -1,11 +1,8 @@
 /*
  * ClientThread.java
  *
- * Thread responsável por esperar por respostas do servidor.
- * Não só espera por respostas do servidor como também é responsável por tratar
- * PDU de consulta (CONSULT_REQUEST) por parte do servidor como responder aos mesmos pedidos.
- * Além de responder ao servidor se têm ou não uma música, também pode enviar uma música
- * para outro utilizador.
+ * Thread responsável por processar CONSULT_REQUEST provenientes do servidor e
+ * responder se têm ou não o ficheiro que se procura.
  *
  * @date  24052016
  */
@@ -29,10 +26,11 @@ public class ClientThread extends Thread {
   /** Construtor parametrizado.
    *  @param  socket  Socket pela qual a thread deverá comunicar.
    */
-  public ClientThread(BufferedReader reader, PrintWriter writer, String username) {
+  public ClientThread(Socket socket, String username) {
     try {
-      this.reader   = reader;
-      this.writer   = writer;
+      this.writer  = new PrintWriter(socket.getOutputStream());
+      this.reader  = new BufferedReader(new InputStreamReader(
+          socket.getInputStream(), "UTF-8"));
       this.username = username;
     }
     catch (Exception e) {
@@ -77,11 +75,8 @@ public class ClientThread extends Thread {
    *  o PDU. */
   private void parsePDUData(int version, int security, int type, String options) {
     switch(type) {
-      case 2:   // CONSULT RESPONSE.
+      case 2:   // CONSULT REQUEST.
         consultRequest();
-        break;
-      case 3:   // CONSULT RESPONSE.
-        consultResponse();
         break;
       default:
         System.out.println(type);
@@ -104,29 +99,18 @@ public class ClientThread extends Thread {
 
       // Verificar se a música está na pasta /music.
       File f = new File("music/" + band + " - " + song + "." + extension);
-      System.out.println(f.toString());
       if (f.exists() && !f.isDirectory()) {
-        System.out.println("Ficheiro encontrado.");
+        // Avisar servidor que ficheiro existe.
+        writer.println("FOUND");
+        writer.flush();
+      } else {
+        // Avisar servidor que ficheiro não existe.
+        writer.println("NOT FOUND");
+        writer.flush();
       }
-
     } catch (Exception e) {
       System.out.println(e);
     }
   }
 
-  /** Parse the consult response PDU. */
-  private void consultResponse() {
-    try {
-      int found       = Integer.parseInt(reader.readLine());
-      int clients     = Integer.parseInt(reader.readLine());
-      String id       = reader.readLine();
-      String ip       = reader.readLine();
-      int port        = Integer.parseInt(reader.readLine());
-
-      if (found == 0) { System.out.println("Música não encontrada..."); }
-      else  { System.out.println("Música encontrada no: " + ip + ":" + port); }
-    } catch (Exception e) {
-      System.out.println(e);
-    }
-  }
 }
