@@ -124,6 +124,7 @@ public class ServerThread extends Thread {
       Iterator  it              = usernames.iterator();
       String    ip = "", user = "", found;
       ConsultResponsePDU response;
+      Integer users = 0, port = 0;
 
       // Percorrer lista de usernames e enviar o consult request a todos.
       while (it.hasNext()) {
@@ -147,7 +148,9 @@ public class ServerThread extends Thread {
             System.out.println(user + " -> " + found);
 
             if (found.equals("FOUND")) {  // Ficheiro encontrado, adicionar ip à lista.
-              ip = socket.getLocalAddress().toString();
+              ip    = socket.getLocalAddress().toString();
+              port  = socket.getPort();
+              users++;
             }
           }
         }
@@ -157,7 +160,7 @@ public class ServerThread extends Thread {
       if (ip.equals("")) {
         response = new ConsultResponsePDU(0, 0, "", "", 0);
       } else {
-        response = new ConsultResponsePDU(1, 0, user, ip, 8081);
+        response = new ConsultResponsePDU(1, users, user, ip, port);
       }
       writer.println(response.toString());
       writer.flush();
