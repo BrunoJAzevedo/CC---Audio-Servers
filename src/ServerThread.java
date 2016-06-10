@@ -122,16 +122,17 @@ public class ServerThread extends Thread {
       ConsultRequestPDU request = new ConsultRequestPDU(band, song, extension);
       Set<String> usernames     = server.getUsernames();
       Iterator  it              = usernames.iterator();
-      String    ip = "", user = "", found;
+      String    ip = "", user = "", current_user, found;
       ConsultResponsePDU response;
       Integer users = 0, port = 0;
+      long begin, end, time_elapsed = 1000000000;
 
       // Percorrer lista de usernames e enviar o consult request a todos.
       while (it.hasNext()) {
-        user = (String) it.next();
+        current_user = (String) it.next();
 
-        if (user != username) {
-          Socket socket = server.getUserSocket(user);
+        if (current_user != username) {
+          Socket socket = server.getUserSocket(current_user);
 
           if (socket != null) {
             // Enviar consult request ao cliente e verificar se têm música.
@@ -139,18 +140,25 @@ public class ServerThread extends Thread {
             BufferedReader r  = new BufferedReader(new InputStreamReader(
               socket.getInputStream(), "UTF-8"));
 
-            System.out.println("A consultar user: " + user + " -- " + socket.toString());
+            begin = System.nanoTime();
+            System.out.println("A consultar user: " + current_user + " -- " + socket.toString());
             w.println(request.toString());
             w.flush();
 
             // Verificar se cliente diz "FOUND" (tem ficheiro) ou "NOT FOUND" não tem ficheiro.
             found = r.readLine();
-            System.out.println(user + " -> " + found);
+            end   = System.nanoTime();
+            System.out.println(current_user + " -> " + found + " | " + (end - begin));
 
-            if (found.equals("FOUND")) {  // Ficheiro encontrado, adicionar ip à lista.
-              ip    = socket.getLocalAddress().toString();
-              port  = socket.getPort();
+            if (found.equals("FOUND")){
               users++;
+              if ((end - begin) < time_elapsed) {
+                // Ficheiro encontradoe e reposta mais rápida, trocar ip.
+                ip            = socket.getLocalAddress().toString();
+                user          = current_user;
+                time_elapsed  = end - begin;
+                port          = socket.getPort();
+              }
             }
           }
         }
