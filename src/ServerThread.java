@@ -60,8 +60,11 @@ public class ServerThread extends Thread {
     case 1:   // FIXME: Utilizar a classe PDUType.
       parseRegisterPDU();
       break;
-    case 2:
+    case 2:   // CONSULT REQUEST PDU.
       parseConsultRequestPDU();
+      break;
+    case 6:   // REQUEST PDU.
+      parseRequestPDU();
       break;
     default:  // FIXME: <-- Limpar o reader caso não seja um PDU.
       break;
@@ -176,6 +179,35 @@ public class ServerThread extends Thread {
       System.out.println(e);
       writer.println("Oops! Algo de errado se passou.");
       writer.flush();
+    }
+  }
+
+  /** Interpreta um PDU do tipo REQUEST avisando o cliente para ligar o servidor UDP. */
+  private void parseRequestPDU() {
+    try {
+      System.out.println("[REQUEST PDU]");
+      String  band;
+      String  song;
+      String  extension;
+      String  id;
+      int     port;
+
+      band      = reader.readLine();
+      song      = reader.readLine();
+      extension = reader.readLine();
+      id        = reader.readLine();
+      port      = Integer.parseInt(reader.readLine());
+      System.out.println("LOL");
+
+      // Ir buscar o socket associado ao utilizador e reenviar o PDU de REQUEST.
+      Socket socket = server.getUserSocket(id);
+      if (socket != null) {
+        PrintWriter w     = new PrintWriter(socket.getOutputStream());
+        w.println(new RequestPDU(band, song, extension, id, port));
+        w.flush();
+      }
+    } catch(Exception e) {
+      System.out.println(e);
     }
   }
 }

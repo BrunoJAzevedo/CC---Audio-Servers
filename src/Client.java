@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -99,7 +98,15 @@ public class Client {
               int port        = Integer.parseInt(reader.readLine());
 
               if (found == 0) { System.out.println("Música não encontrada..."); }
-              else  { System.out.println("Música encontrada no: " + c_ip + ":" + port); }
+              else  {
+                // Arrancar o socket UDP do client e enviar request ao servidor.
+                UDPClient udp_client  = new UDPClient(
+                  matcher.group(1) + " - " + matcher.group(2) + "." + matcher.group(3), 9876);
+                udp_client.start();
+                writer.println(new RequestPDU(matcher.group(1), matcher.group(2),
+                  matcher.group(3), id, 9876).toString());
+                writer.flush();
+              }
             } catch (Exception e) {
               System.out.println(e);
             }

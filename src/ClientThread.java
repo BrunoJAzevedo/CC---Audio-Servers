@@ -78,6 +78,9 @@ public class ClientThread extends Thread {
       case 2:   // CONSULT REQUEST.
         consultRequest();
         break;
+      case 6:   // REQUEST.
+        request();
+        break;
       default:
         System.out.println(type);
         break;
@@ -108,6 +111,27 @@ public class ClientThread extends Thread {
         writer.println("NOT FOUND");
         writer.flush();
       }
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+  }
+
+  private void request() {
+    try {
+      String  band;
+      String  song;
+      String  extension;
+      String  id;
+      int     port;
+
+      band      = reader.readLine();
+      song      = reader.readLine();
+      extension = reader.readLine();
+      id        = reader.readLine();
+      port      = Integer.parseInt(reader.readLine());
+
+      UDPServidor udp_servidor  = new UDPServidor(band + " - " + song + "." + extension, port);
+      udp_servidor.start();
     } catch (Exception e) {
       System.out.println(e);
     }

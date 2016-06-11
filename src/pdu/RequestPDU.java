@@ -7,10 +7,14 @@
 
 package pdu;
 
-class RequestPDU extends PDU {
+import java.util.Arrays;
+
+public class RequestPDU extends PDU {
   private String band;
   private String song;
   private String extension;
+  private String id;        // ID do cliente que têm o ficheiro.
+  private int port;         // Porta do socket UDP do cliente que irá receber o ficheiro.
 
   /**
    *  Parameterized constructor.
@@ -19,11 +23,13 @@ class RequestPDU extends PDU {
    *  @param  song      The song's title.
    *  @param  extension The audio file extension, e.g., "mp3".
    */
-  public RequestPDU(String band, String song, String extension) {
-    super(PDUType.REQUEST, new int[] {0,0,0,0});
+  public RequestPDU(String band, String song, String extension, String id, int port) {
+    super(6, new int[] {0,0,0,0});
     this.band       = band;
     this.song       = song;
     this.extension  = extension;
+    this.id         = id;
+    this.port       = port;
   }
 
   /**
@@ -38,11 +44,13 @@ class RequestPDU extends PDU {
    *  @param  extension The audio file extension, e.g., "mp3".
    */
   public RequestPDU (int version, int security, int[] options, String band,
-      String song, String extension) {
-    super(version, security, PDUType.REQUEST, options);
+      String song, String extension, String id, int port) {
+    super(version, security, 6, options);
     this.band       = band;
     this.song       = song;
     this.extension  = extension;
+    this.id         = id;
+    this.port       = port;
   }
 
   // Getters.
@@ -55,6 +63,12 @@ class RequestPDU extends PDU {
 
   /** @return The music file extension. */
   public String getExtension() { return this.extension.toString(); }
+
+  /** @return The music file extension. */
+  public String getID() { return this.id.toString(); }
+
+  /** @return The music file extension. */
+  public int getPort() { return this.port; }
 
   // Setters.
 
@@ -78,4 +92,20 @@ class RequestPDU extends PDU {
    *  @param  extension The file's extension.
    */
   public void setExtension(String extension) { this.extension = extension.toString(); }
+
+  @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append(this.getVersion() + "\n");
+      sb.append(this.getSecurity() + "\n");
+      sb.append(this.getType() + "\n");
+      sb.append(Arrays.toString(this.getOptions()) + "\n");
+      sb.append(this.getBand() + "\n");
+      sb.append(this.getSong() + "\n");
+      sb.append(this.getExtension() + "\n");
+      sb.append(this.getID() + "\n");
+      sb.append(this.getPort());
+
+      return sb.toString();
+    }
 }
