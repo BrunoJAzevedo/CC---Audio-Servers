@@ -106,6 +106,7 @@ public class Client {
                 writer.println(new RequestPDU(matcher.group(1), matcher.group(2),
                   matcher.group(3), id, 9876).toString());
                 writer.flush();
+                udp_client.join();
               }
             } catch (Exception e) {
               System.out.println(e);

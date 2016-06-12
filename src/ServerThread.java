@@ -197,7 +197,6 @@ public class ServerThread extends Thread {
       extension = reader.readLine();
       id        = reader.readLine();
       port      = Integer.parseInt(reader.readLine());
-      System.out.println("LOL");
 
       // Ir buscar o socket associado ao utilizador e reenviar o PDU de REQUEST.
       Socket socket = server.getUserSocket(id);
